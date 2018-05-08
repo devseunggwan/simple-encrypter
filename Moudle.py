@@ -2,7 +2,7 @@ import numpy as np
 
 #비트 선택 모듈
 def Bit(Code: int) -> int:
-    Bit = {'1': 128, '2': 256, '3': 512, '4': 1024, '5': 2048, '6':4096}  #7:8192}
+    Bit = {'1': 128, '2': 256, '3':512, '4':1024, '5': 2048, '6':4096, "7":8192, "8": 16384}
     return Bit[Code]
 
 #2진수->한글 마지막 남는 2진수 6비트화
@@ -10,10 +10,6 @@ def EncodeEndPoint(Code: int ) -> str:
     if(Code%2 == 1): return "0000"
     else: return "00"
 
-#남는 비트수 계산
-def Minus(Bit: int):
-    Select = {128: 2, 256: 4, 512: 2, 1024: 4, 2048:2, 4096:4}
-    return Select[Bit]
 
 #한글->2진수 원래있던 비트수만큼 돌려놓기
 def DecodeEndPoint(Code: int) -> int:
@@ -23,14 +19,14 @@ def DecodeEndPoint(Code: int) -> int:
 
 #슬라이싱
 def Slicetext(Bintext: str, Bit: int, Switch: int) -> list:
-    X = [""] * ((len(Bintext) // Bit )+ Switch)
-    for i in np.arange(0,((len(Bintext)//Bit)+1)*Bit,Bit):
+    X = [""] * ((len(Bintext) // Bit) + Switch)
+    for i in np.arange(0,((len(Bintext)//Bit)+Switch)*Bit,Bit):
         if(len(Bintext[i:]) == 0 ): break
         elif(len(Bintext[i:]) < Bit):
             X[i // Bit] = Bintext[i:]
             for Supply in np.arange(len(Bintext),((len(Bintext)//Bit)+1)*Bit):
                 X[(i//Bit)] += "0"
-        else: X[i//Bit] = Bintext[i:((i+1)*Bit)]
+        else: X[i//Bit] = Bintext[i:(i+Bit)]
     return X
 
 #문자->ASCII->2진수
@@ -71,7 +67,7 @@ def Change(Text: str, Key: str):
             break
 
     for Y in np.arange (0, repeat + 1):
-        Key = KeyDevide (Key, Y)
+        Key = KeyDevide(Key, Y)
         Text = CryptCode(Text, Key, len(Key))
 
     return Text
@@ -80,17 +76,17 @@ def Change(Text: str, Key: str):
 #암호화(XOR) 연산 모듈
 def CryptCode(Text:str, Key:str, Bit:int) -> str:
     Code = ""
-    for i in np.arange(0, len(Text)):
+    for i in np.arange(0, Bit):
         if(Key[i] != Text[i]): Code += "1"
         elif(Key[i] == Text[i]): Code += "0"
     return Code
 
 
 #2진수를 한글로 바꾸는 모듈
-def NarasarangEncoding(Code: str, Bit: int) -> str:
+def NarasarangEncoding(Code: str) -> str:
     Save = ""
-    for i in np.arange(0,Bit//6*6,6): Save += NarasarangEncode(Code[i:i+6])
-    Save += NarasarangEncode(Code[Bit-Minus(Bit):]+EncodeEndPoint(int(np.log2(Bit))-6))
+    for i in np.arange(0,((len(Code)//6)*6),6): Save += NarasarangEncode(Code[i:i+6])
+    Save += NarasarangEncode(Code[((len(Code)//6)*6):]+((6-(len(Code)%6))*"0"))
     return Save
 
 
