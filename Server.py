@@ -38,7 +38,7 @@ def Verse1():
     ESlice = Moudle.Slicetext(EBinText, Moudle.Bit(values['Bit']), 1)           # 2진수로 변환한 평문을 비트 수 만큼 슬라이싱
     for X in np.arange(0,len(ESlice)):
         EPuzzle += Moudle.Change(ESlice[X],EBinKey)
-    Encode = Moudle.NarasarangEncoding(EPuzzle,len(EPuzzle))                    # 암호화한 2진수를 한글로 인코딩
+    Encode = Moudle.NarasarangEncoding(EPuzzle)                    # 암호화한 2진수를 한글로 인코딩
 
     response = {
         'Encode': Encode
