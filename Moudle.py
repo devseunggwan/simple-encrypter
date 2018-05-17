@@ -1,31 +1,32 @@
+import random
 import numpy as np
 
-#비트 선택 모듈
+#Choice Key Bit
 def Bit(Code: int) -> int:
     Bit = {'1': 128, '2': 256, '3':512, '4':1024, '5': 2048, '6':4096, "7":8192, "8": 16384}
     return Bit[Code]
 
-#2진수->한글 마지막 남는 2진수 6비트화
-def EncodeEndPoint(Code: int ) -> str:
-    if(Code%2 == 1): return "0000"
-    else: return "00"
 
-
-#한글->2진수 원래있던 비트수만큼 돌려놓기
-def DecodeEndPoint(Code: int) -> int:
-    if(Code%2 == 1): return 4
-    else: return 2
-
-
-#슬라이싱
+#Slicing & Padding
+#Bintext: Text, Bit: 128, Switch: Text(Encode or Decode) or Key
 def Slicetext(Bintext: str, Bit: int, Switch: int) -> list:
     X = [""] * ((len(Bintext) // Bit) + Switch)
     for i in np.arange(0,((len(Bintext)//Bit)+Switch)*Bit,Bit):
         if(len(Bintext[i:]) == 0 ): break
         elif(len(Bintext[i:]) < Bit):
             X[i // Bit] = Bintext[i:]
-            for Supply in np.arange(len(Bintext),((len(Bintext)//Bit)+1)*Bit):
-                X[(i//Bit)] += "0"
+            if((((len(Bintext)//Bit)+1)*Bit) - len(Bintext) < 7):
+
+                # '0' 패딩 개수가 '7' 이하일 때 '0'으로만 padding
+                for SupplyZero in np.arange (len (Bintext), ((len (Bintext) // Bit) + 1) * Bit): X[(i // Bit)] += "0"
+            else:
+                # '0' 패딩 개수가 '7' 이상일 때 '0' 7개를 padding
+                for SupplyZero in np.arange(len(Bintext),(len(Bintext)+7)): X[(i//Bit)] += "0"
+
+                # '0' 과 '1' 를 빈 곳 끝까지 padding
+                X[(i//Bit)] += bin(random.randrange(pow(2,(((len(Bintext)//Bit)+1)*Bit - ((len(Bintext)+7)) -1)), pow(2,(((len(Bintext)//Bit)+1)*Bit-((len(Bintext)+7))))))[2:]
+
+        # (0:Bit) 수 만큼 Slice 실행
         else: X[i//Bit] = Bintext[i:(i+Bit)]
     return X
 
@@ -33,9 +34,9 @@ def Slicetext(Bintext: str, Bit: int, Switch: int) -> list:
 def BinText(Text: str):
     Testcase = ""
     for i in Text:
-        T = str(bin(ord(i))[2:])                                      #문자->ASCII->2진수화
-        if(len(T) < 7): Testcase += (((7 - len(T)) * "0") + T)        #7Bit 아닐시 7비트형으로 만듬
-        else: Testcase += T                                           #2진수 문자 저장
+        T = str(bin(ord(i))[2:])                                      # 문자->ASCII->2진수화
+        if(len(T) < 7): Testcase += (((7 - len(T)) * "0") + T)        # 7Bit 아닐시 7비트형으로 만듬
+        else: Testcase += T                                           # 2진수 문자 저장
     return Testcase
 
 
@@ -47,15 +48,16 @@ def TextBin(Text: str) ->int:
         Tenlist += chr(int(("0b"+Text[X:X+7]),2))
     return Tenlist
 
-# 복호화(xor) 연산 모듈
-def KeyDevide(Key: str, binary: int) -> str:  # key: 키, binary: 자르기횟수... 1이면 2토막, 2면 4...
+# 복호화(XOR) 연산 모듈
+# key: 키, binary: 자르기횟수 N (pow(2, N-1)
+def KeyDevide(Key: str, binary: int) -> str:
     ReturnValue = ""
     if binary == 0: return Key
-    Key = list (Key)
-    boxNum = pow (2, binary)
-    field = len (Key) // boxNum
-    nextIndex = len (Key) // (2 ** (binary - 1))
-    for i in np.arange (0, len (Key), nextIndex): Key[i:i + field], Key[i + field:i + field * 2] = Key[i + field:i + field * 2], Key[i:i + field]
+    Key = list(Key)
+    boxNum = pow(2, binary)
+    field = len(Key) // boxNum
+    nextIndex = len(Key) // (2 ** (binary - 1))
+    for i in np.arange (0, len (Key), nextIndex): Key[i:i+field], Key[i+field:i+field * 2] = Key[i+field:i+field*2], Key[i:i+field]
     for Y in np.arange (0, len (Key)): ReturnValue += Key[Y]
     return ReturnValue
 
