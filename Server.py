@@ -18,7 +18,7 @@ def Givekey():
 
     key = str(hex(random.randrange (pow(2, (Moudle.Bit(Bit['Bit'])-1)), pow(2, Moudle.Bit(Bit['Bit'])))))[2:]
     response = {
-        'Serial Number': str(hashlib.sha256(key.encode()).hexdigest()),
+        #'Serial Number': str(hashlib.sha256(key.encode()).hexdigest()),
         'Add a new key': key
     }
     return jsonify(response), 201
@@ -28,20 +28,31 @@ def Givekey():
 @app.route("/getEncryptResponse", methods=["POST"])
 def Verse1():
     values = request.get_json()
-    required = ['Text', 'Serial_Number', 'Key', 'Bit']
+    required = ['Text', 'Key']
     if not all (k in values for k in required):
         return 'Missing values', 400
 
-    EPuzzle = ""
+    __EPuzzle__ = ""
     EBinKey = str(bin(int('0x' + values['Key'], 16)))[2:]                       # 16진수에서 2진수로 변환한 키
     EBinText = Moudle.BinText(values['Text'])                                   # Text에서 2진수로 변환한 평문
-    ESlice = Moudle.Slicetext(EBinText, Moudle.Bit(values['Bit']), 1)           # 2진수로 변환한 평문을 비트 수 만큼 슬라이싱
-    for X in np.arange(0,len(ESlice)):
-        EPuzzle += Moudle.Change(ESlice[X],EBinKey)
-    Encode = Moudle.NarasarangEncoding(EPuzzle)                    # 암호화한 2진수를 한글로 인코딩
+    ESliceText = Moudle.Slicetext(EBinText, 128, 1)                             # 2진수로 변환한 평문을 비트 수 만큼 슬라이싱
+    ESliceKey = Moudle.Slicetext(EBinKey, 128, 0)
+
+    for Key in ESliceKey:
+        for Text in range(0,len(ESliceText)):
+            ESliceText[Text] = Moudle.Change(ESliceText[Text], Key)
+
+    for X in np.arange(0,len(ESliceText)):
+        __EPuzzle__ += ESliceText[X]
+
+    Encode = Moudle.NarasarangEncoding(__EPuzzle__)                             # 암호화한 2진수를 한글로 인코딩
 
     response = {
-        'Encode': Encode
+        'Encode': Encode,
+        "EBinKey": EBinKey,
+        "EBinText": EBinText,
+        "ESliceText": ESliceText,
+        "ESliceKey": ESliceKey
     }
 
     return jsonify(response), 201
@@ -52,22 +63,37 @@ def Verse1():
 def Verse2():
     values = request.get_json()
 
-    required = ['EncryptText', 'Serial_Number', 'Key', 'Bit']
+    required = ['EncryptText', 'Key']
     if not all (k in values for k in required):
         return 'Missing values', 400
 
 
-    DPuzzle = ""
+    __DPuzzle__ = ""
+
+
     DBinKey = str(bin(int('0x' + values['Key'], 16)))[2:]
     DBinText = Moudle.NarasarangDecoding(values['EncryptText'])
-    DSlice = Moudle.Slicetext (DBinText, Moudle.Bit(values['Bit']), 0)
-    for X in np.arange (0, len(DSlice)):
-        DPuzzle += Moudle.Change (DSlice[X], DBinKey)
-    Decode = Moudle.TextBin(DPuzzle)
+    DSliceText = Moudle.Slicetext (DBinText, 128, 0)
+    DSliceKey = Moudle.Slicetext (DBinKey, 128, 0)
+
+    for Key in DSliceKey:
+        for Text in range(0,len(DSliceText)):
+            DSliceText[Text] = Moudle.Change(DSliceText[Text], Key)
+
+
+    for X in np.arange(0,len(DSliceText)):
+        __DPuzzle__ += DSliceText[X]
+
+
+    Decode = Moudle.TextBin(__DPuzzle__)
 
 
     response = {
-        'Decode': Decode
+        'Decode': Decode,
+        "DBinKey": DBinKey,
+        "DBinText": DBinText,
+        "DSliceText": DSliceText,
+        "DSliceKey": DSliceKey
     }
 
     return jsonify(response), 201
