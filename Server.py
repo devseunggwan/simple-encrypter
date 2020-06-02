@@ -7,45 +7,50 @@ import Moudle
 app = Flask(__name__)
 
 
-#Key Supply
+# Key Supply
 @app.route("/getKeyRequest", methods=['POST'])
 def Givekey():
     Bit = request.get_json()
 
     required = ['Bit']
-    if not all (k in Bit for k in required):
+    if not all(k in Bit for k in required):
         return 'Missing values', 400
 
-    key = str(hex(random.randrange (pow(2, (Moudle.Bit(Bit['Bit'])-1)), pow(2, Moudle.Bit(Bit['Bit'])))))[2:]
+    key = str(hex(random.randrange(
+        pow(2, (Moudle.Bit(Bit['Bit'])-1)), pow(2, Moudle.Bit(Bit['Bit'])))))[2:]
     response = {
-        #'Serial Number': str(hashlib.sha256(key.encode()).hexdigest()),
+        # 'Serial Number': str(hashlib.sha256(key.encode()).hexdigest()),
         'Add a new key': key
     }
     return jsonify(response), 201
 
 
-#Encrypting Code
+# Encrypting Code
 @app.route("/getEncryptResponse", methods=["POST"])
 def Verse1():
     values = request.get_json()
     required = ['Text', 'Key']
-    if not all (k in values for k in required):
+    if not all(k in values for k in required):
         return 'Missing values', 400
 
     __EPuzzle__ = ""
-    EBinKey = str(bin(int('0x' + values['Key'], 16)))[2:]                       # 16진수에서 2진수로 변환한 키
-    EBinText = Moudle.BinText(values['Text'])                                   # Text에서 2진수로 변환한 평문
-    ESliceText = Moudle.Slicetext(EBinText, 128, 1)                             # 2진수로 변환한 평문을 비트 수 만큼 슬라이싱
+    # 16진수에서 2진수로 변환한 키
+    EBinKey = str(bin(int('0x' + values['Key'], 16)))[2:]
+    # Text에서 2진수로 변환한 평문
+    EBinText = Moudle.BinText(values['Text'])
+    # 2진수로 변환한 평문을 비트 수 만큼 슬라이싱
+    ESliceText = Moudle.Slicetext(EBinText, 128, 1)
     ESliceKey = Moudle.Slicetext(EBinKey, 128, 0)
 
     for Key in ESliceKey:
-        for Text in range(0,len(ESliceText)):
+        for Text in range(0, len(ESliceText)):
             ESliceText[Text] = Moudle.Change(ESliceText[Text], Key)
 
-    for X in np.arange(0,len(ESliceText)):
+    for X in np.arange(0, len(ESliceText)):
         __EPuzzle__ += ESliceText[X]
 
-    Encode = Moudle.NarasarangEncoding(__EPuzzle__)                             # 암호화한 2진수를 한글로 인코딩
+    # 암호화한 2진수를 한글로 인코딩
+    Encode = Moudle.NarasarangEncoding(__EPuzzle__)
 
     response = {
         'Encode': Encode,
@@ -58,35 +63,29 @@ def Verse1():
     return jsonify(response), 201
 
 
-#Decrypting Code
+# Decrypting Code
 @app.route("/getDecryptResponse", methods=["POST"])
 def Verse2():
     values = request.get_json()
 
     required = ['EncryptText', 'Key']
-    if not all (k in values for k in required):
+    if not all(k in values for k in required):
         return 'Missing values', 400
-
 
     __DPuzzle__ = ""
 
-
     DBinKey = str(bin(int('0x' + values['Key'], 16)))[2:]
     DBinText = Moudle.NarasarangDecoding(values['EncryptText'])
-    DSliceText = Moudle.Slicetext (DBinText, 128, 0)
-    DSliceKey = Moudle.Slicetext (DBinKey, 128, 0)
+    DSliceText = Moudle.Slicetext(DBinText, 128, 0)
+    DSliceKey = Moudle.Slicetext(DBinKey, 128, 0)
 
     for Key in DSliceKey:
-        for Text in range(0,len(DSliceText)):
+        for Text in range(0, len(DSliceText)):
             DSliceText[Text] = Moudle.Change(DSliceText[Text], Key)
-
-
-    for X in np.arange(0,len(DSliceText)):
+    for X in np.arange(0, len(DSliceText)):
         __DPuzzle__ += DSliceText[X]
 
-
     Decode = Moudle.TextBin(__DPuzzle__)
-
 
     response = {
         'Decode': Decode,
@@ -97,6 +96,7 @@ def Verse2():
     }
 
     return jsonify(response), 201
+
 
 if __name__ == '__main__':
     app.run(debug=True)
