@@ -15,7 +15,7 @@ def xor(key1, key2):
         else: res += "1"
     return res
 
-@app.route("/RSA", methods=['GET'])
+@app.route("/rsa", methods=['GET'])
 def createRSA():
     random_generator = Random.new().read
     key = RSA.generate(1024, random_generator)
