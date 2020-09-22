@@ -31,7 +31,7 @@
 2. 서버로 부여받은 키를 라운드를 거치면서 섞고, 평문과 XOR한다.
 3. 치환 테이블을 사용하여 6Bit씩 숫자에 맞는 한글로 인코딩된다.
 
-![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/c801e6e1-6be6-472a-aaa9-973028560ed2/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/c801e6e1-6be6-472a-aaa9-973028560ed2/Untitled.png)
+![1](./image/2.png)
 
 ### 복호화
 
@@ -39,7 +39,7 @@
 2. 암호화 시 사용했던 대칭키를 사용하여 암호화와 반대로 섞으면서 XOR을 진행한다.
 3. ASCII 코드로 사용할 수 있도록 문장을 끊어서 복호화한다.
 
-![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/6ab98652-56a6-492f-9f48-260a5f6ba962/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/6ab98652-56a6-492f-9f48-260a5f6ba962/Untitled.png)
+![1](./image/1.png)
 
 # Server
 
@@ -52,20 +52,21 @@
 
         ```json
         {
-        		'1': 128, 
-        		'2': 256, 
-        		'3': 512, 
-        		'4': 1024, 
-        		'5': 2048, 
-        		'6': 4096, 
-        		'7': 8192, 
-        		'8': 16384
+        		"1": 128, 
+        		"2": 256, 
+        		"3": 512, 
+        		"4": 1024, 
+        		"5": 2048, 
+        		"6": 4096, 
+        		"7": 8192, 
+        		"8": 16384
         }
         ```
 
 - Response Message
-    - Add a new key: 요청된 Bit에 맞는 무작위 대칭키를 반환한다.
-
+    
+- Add a new key: 요청된 Bit에 맞는 무작위 대칭키를 반환한다.
+    
 - Example
 
     ```json
@@ -74,12 +75,12 @@
 
     #Request
     {
-    		'Bit': '1'
+    		"Bit": "1"
     }
 
     #Response
     {
-    		'Add a new key': '128Bit Random Key'
+    		"Add a new key": "128Bit Random Key"
     }
     ```
 
@@ -91,8 +92,9 @@
     - Text: 암호화를 할 문장을 적는다.
     - Key: 가져온 대칭키를 적는다.
 - Response Message
-    - Encode: 인코딩 된 문장이 반환된다.
-
+    
+- Encode: 인코딩 된 문장이 반환된다.
+    
 - Example
 
     ```json
@@ -101,13 +103,13 @@
 
     #Request
     {
-    		'Text': 'Message'
-    		'Key': '128Bit Random Key'
+    		"Text": "Message"
+    		"Key": "128Bit Random Key"
     }
 
     #Response
     {
-    		'Encode': 'Encode Message'
+    		"Encode": "Encode Message"
     }
     ```
 
@@ -119,8 +121,9 @@
     - EncryptText: 암호화된 문장을 넣는다.
     - Key: 암호화 시 사용한 문장을 넣는다.
 - Response Message
-    - Decode: 복호화 된 평문이 반환된다.
-
+    
+- Decode: 복호화 된 평문이 반환된다.
+    
 - Example
 
     ```json
@@ -129,13 +132,13 @@
 
     #Request
     {
-    		'Text': 'Encode Message'
-    		'Key': '128Bit Random Key'
+    		"Text": "Encode Message"
+    		"Key": "128Bit Random Key"
     }
 
     #Response
     {
-    		'Decode': 'Text'
+    		"Decode": "Text"
     }
     ```
 
