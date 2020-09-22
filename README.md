@@ -103,7 +103,7 @@
 
     #Request
     {
-    		"Text": "Message"
+    		"Text": "Message",
     		"Key": "128Bit Random Key"
     }
 
@@ -132,7 +132,7 @@
 
     #Request
     {
-    		"Text": "Encode Message"
+    		"Text": "Encode Message",
     		"Key": "128Bit Random Key"
     }
 
